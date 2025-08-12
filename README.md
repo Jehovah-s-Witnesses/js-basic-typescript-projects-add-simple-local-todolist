@@ -1,6 +1,6 @@
-# template-vanilla-ts
+# js-basic-typescript-projects-add-simple-local-todolist
 
-## Text
+## Need add typescript to this project
 
 ## Criteria:
 
