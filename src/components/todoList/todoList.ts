@@ -1,6 +1,14 @@
-import { generateId } from '../../services/generateId.js';
+import { generateId } from '../../services/generateId.ts';
+import type { Todo } from '../../Types/todo.ts';
 
-export const TodoList = {
+type TodoListType = {
+  wrapper: HTMLDivElement | null;
+  createTodoHTML(id: string, title: string, description: string): string;
+  updateLayout(todos?: Todo[]): void;
+  render(): HTMLDivElement;
+};
+
+export const TodoList: TodoListType = {
   wrapper: null,
   createTodoHTML(id, title, description) {
     return `
@@ -13,6 +21,9 @@ export const TodoList = {
     `;
   },
   updateLayout(todos = []) {
+    if (!this.wrapper) {
+      return;
+    }
     this.wrapper.innerHTML = '';
     const wrapperElement = document.createElement('nav');
     wrapperElement.classList.add('panel');

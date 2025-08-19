@@ -1,7 +1,7 @@
 export const Layout = {
-  render(items  = []) {
-    const wrapper = document.createElement('div');
-    const childrenWrapper = document.createElement('div');
+  render(items : Element [] = []) : void {
+    const wrapper : HTMLDivElement = document.createElement('div');
+    const childrenWrapper : HTMLDivElement = document.createElement('div');
 
     wrapper.classList.add('container', 'pt-4');
     childrenWrapper.classList.add('col');
