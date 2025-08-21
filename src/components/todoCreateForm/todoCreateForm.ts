@@ -1,9 +1,19 @@
 import { generateId } from '../../services/generateId.ts';
-import { createValidator } from '../../services/createValidator.js';
-import { todoCreateFormSchema } from './todoCreateForm.schema.js';
-import { getAjvErrorKey } from '../../utils/getAjvErrorKey.js';
+import { createValidator } from '../../services/createValidator.ts';
+import { todoCreateFormSchema } from './todoCreateForm.schema.ts';
+import { getAjvErrorKey } from '../../utils/getAjvErrorKey.ts';
+import type { Todo, TodoPayload } from '../../Types/todo.ts';
 
-export const TodoCreateForm = {
+type OnAddCallback = (todo: Todo) => void;
+
+type ToDoCreateFormType = {
+  onAdd: null | OnAddCallback;
+  setOnAdd(onAdd: OnAddCallback): void;
+  initialize(formElement: HTMLFormElement): void;
+  render(): HTMLFormElement;
+};
+
+export const TodoCreateForm: ToDoCreateFormType = {
   onAdd: null,
   setOnAdd(onAdd) {
     this.onAdd = onAdd;
@@ -13,36 +23,41 @@ export const TodoCreateForm = {
       event.preventDefault();
 
       const formData = new FormData(formElement);
-      const data = Object.fromEntries(formData);
-      const validate = createValidator(todoCreateFormSchema);
+      const data = Object.fromEntries(formData) as TodoPayload;
+      const validate = createValidator<TodoPayload>(todoCreateFormSchema);
 
       const isValid = validate(data);
 
-      if (!isValid) {
+      if (!isValid && validate.errors) {
         validate.errors.forEach((error) => {
           const fieldName = getAjvErrorKey(error.instancePath);
-          const inputElement = formElement.elements[fieldName];
-          const fieldWrapper = inputElement.closest('.field');
-          const errorMessageElement = document.createElement('p');
+          const inputElement = formElement.elements.namedItem(fieldName);
 
-          errorMessageElement.classList.add('help', 'is-danger');
-          errorMessageElement.innerText = error.message;
-          inputElement.classList.add('is-danger');
-          fieldWrapper.append(errorMessageElement);
+          if (inputElement instanceof Element) {
+            const fieldWrapper = inputElement.closest('.field');
+            const errorMessageElement = document.createElement('p');
+
+            errorMessageElement.classList.add('help', 'is-danger');
+            errorMessageElement.innerText = error.message ?? '';
+            inputElement.classList.add('is-danger');
+            fieldWrapper?.append(errorMessageElement);
+          }
         });
 
         return;
       } else {
         // Clear all errors
         Object.keys(data).forEach((key) => {
-          const inputElement = formElement.elements[key];
+          const inputElement = formElement.elements.namedItem(key);
 
-          inputElement.classList.remove('is-danger');
-          inputElement.closest('.field')?.querySelector('.help')?.remove();
+          if (inputElement instanceof Element) {
+            inputElement.classList.remove('is-danger');
+            inputElement.closest('.field')?.querySelector('.help')?.remove();
+          }
         });
       }
 
-      this.onAdd({ ...data, id: generateId() });
+      this.onAdd?.({ ...data, id: generateId() });
       formElement.reset();
     });
   },

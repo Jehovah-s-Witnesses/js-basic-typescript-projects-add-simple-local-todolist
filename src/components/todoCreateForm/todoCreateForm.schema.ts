@@ -1,4 +1,7 @@
-export const todoCreateFormSchema = {
+import type { JSONSchemaType } from 'ajv';
+import type { TodoPayload } from '../../Types/todo.ts';
+
+export const todoCreateFormSchema: JSONSchemaType<TodoPayload> = {
   type: 'object',
   properties: {
     title: {

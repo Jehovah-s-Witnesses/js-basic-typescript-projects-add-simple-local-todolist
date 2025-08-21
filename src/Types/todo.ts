@@ -3,3 +3,5 @@ export interface Todo {
   title: string;
   description: string;
 }
+
+export type TodoPayload = Omit<Todo, 'id'>;
